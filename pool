@@ -1,0 +1,244 @@
+import pygame           
+import numpy as np             
+import math                       
+import time                     
+
+#RigidBody class
+class RigidBody:
+    def __init__(self, position, velocity, mass, radius, colour, elasticity=0.9):
+        self.position = np.array(position, dtype=float)  #makan el ball 
+        self.velocity = np.array(velocity, dtype=float)  #el sor3a
+        self.mass = mass 
+        self.radius = radius 
+        self.elasticity = elasticity  #el bounce elly hatetla3 fe el collission
+        self.force = np.zeros(2, dtype=float)  #el force elly bet2sar 3aleha (force applied to the ball)
+        self.colour = colour  #lon el ball
+
+    def apply_force(self, force):
+        self.force += force  #apply el force 3ala el body
+
+
+#PhysicsEngine class
+class PhysicsEngine:
+    def __init__(self):
+        self.bodies = []  #list feha kol el bodies (balls) elly fe el game
+
+    def add_body(self, body):
+        self.bodies.append(body) #add body lel list beta3 el bodies
+
+    def step(self, dt, width, height):
+        friction_coefficient = 0.99 #coefficient el friction 3ashan el balls yslow down (el friction mawgood 3ala el table)
+
+
+        for body in self.bodies: #lekol body fe el game
+            body.force[:] = 0.0  #yreset el forces
+
+            acceleration = body.force / body.mass  #ye7seb el acceleration bta3 el body
+            body.velocity += acceleration * dt  #ye7seb el velocity bta3 el body
+            body.position += body.velocity * dt  #ye7seb el position bta3 el body
+
+
+            #el collision m3 el walls of the table
+            if body.position[0] - body.radius < 20:
+                body.position[0] = 20 + body.radius #ne7ot el ball fel correcy position
+                body.velocity[0] *= -body.elasticity #el velocity bta3 el ball yet3adel 34an el collision fy bounce
+            if body.position[0] + body.radius > width - 20:
+                body.position[0] = width - 20 - body.radius
+                body.velocity[0] *= -body.elasticity
+            if body.position[1] - body.radius < 20:
+                body.position[1] = 20 + body.radius
+                body.velocity[1] *= -body.elasticity
+            if body.position[1] + body.radius > height - 20:
+                body.position[1] = height - 20 - body.radius
+                body.velocity[1] *= -body.elasticity
+
+            body.velocity *= friction_coefficient  #slowdown el ball shwaya be friction
+
+        self.handle_collisions()  #deal ma3a el collisions ma3 el balls
+
+    def handle_collisions(self):
+        for i, bodyA in enumerate(self.bodies):
+            for j, bodyB in enumerate(self.bodies):
+                if i >= j:
+                    continue   #skip el body da law howa nafs el body ely 7asbnah abl keda
+
+                delta = bodyB.position - bodyA.position  #delta ely ben el 2 bodies
+                dist = np.linalg.norm(delta)  #el masafa ben el 2 bodies
+                if dist == 0:  #3ashan ma2darsh a7esb collision law el masafa 0
+                    continue
+
+
+                min_dist = bodyA.radius + bodyB.radius  #el minimum distance ely el 2 bodies yeb2a leeh collision
+                if dist < min_dist:  #law el masafa less than el minimum distance, ye7sal collision
+                    overlap = min_dist - dist  #overlap fel collision
+                    correction = (overlap / 2) * (delta / dist)  #ycalculate el correction 3ashan el bodies ma3ndehash overlap
+                    bodyA.position -= correction  #y7awel ye3adel el position bta3 el body A
+                    bodyB.position += correction  #y3adel el position bta3 el body B
+
+
+                    normal = delta / dist  #el direction normal lel collision
+                    rel_velocity = bodyB.velocity - bodyA.velocity  #el relative velocity
+                    vel_along_normal = np.dot(rel_velocity, normal)  #el velocity fel direction normal
+
+                    if vel_along_normal > 0:
+                        continue  #law el velocity keda ma3 el direction, mate3melsh collision
+
+                    e = min(bodyA.elasticity, bodyB.elasticity)  #elasticities el 2 bodies
+                    j = -(1 + e) * vel_along_normal  #ye7aseb el impulse elly hat2assar 3ala el collision
+                    j /= 1/bodyA.mass + 1/bodyB.mass  #impulse calculation
+
+                    impulse = j * normal  #el impulse beyt3amal lel collision
+                    bodyA.velocity -= impulse / bodyA.mass  #apply el impulse 3ala body A
+                    bodyB.velocity += impulse / bodyB.mass  #apply el impulse 3ala body B
+
+
+#el main game
+def main():
+    pygame.init()  #initialize pygame
+
+
+    WIDTH, HEIGHT = 800, 400  #el size beta3 el screen
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))  #set el screen
+    pygame.display.set_caption("Pool Game 🎱")  #set el title beta3 el game
+
+    GREEN = (0, 120, 0)  #el green colour beta3 el table
+    BROWN = (100, 50, 0)  #el brown colour beta3 el surface
+    WHITE = (255, 255, 255)  #el white colour for the cue ball
+    COLOURS = [  #colours lel balls
+        (255, 255, 0), (0, 0, 255), (255, 0, 0), (128, 0, 128),
+        (255, 165, 0), (0, 255, 0), (128, 0, 0), (0, 0, 0),
+        (255, 255, 0), (0, 0, 255), (255, 0, 0), (128, 0, 128),
+        (255, 165, 0), (0, 255, 0), (128, 0, 0)
+    ]
+
+    pocket_radius = 22  #el radius beta3 el pockets
+    pockets = [  #el positions beta3et el pockets
+        (20, 20), (WIDTH // 2, 20), (WIDTH - 20, 20),
+        (20, HEIGHT - 20), (WIDTH // 2, HEIGHT - 20), (WIDTH - 20, HEIGHT - 20)
+    ]
+
+    font = pygame.font.SysFont(None, 36)  #el font beta3 el text (score, win message)
+
+    def setup_game():   #function to set up el game (initialization)
+        engine = PhysicsEngine()  #initialise el physics engine
+        cue_ball = RigidBody(position=[150, HEIGHT / 2], velocity=[0, 0], mass=1.0, radius=15, colour=WHITE, elasticity=0.95)
+        engine.add_body(cue_ball)  #add el cue ball lel engine
+
+
+        #setup el balls fe shakl triangle 
+        triangle_start_x = WIDTH * 0.7
+        triangle_start_y = HEIGHT / 2
+        ball_radius = 15
+        row_spacing = ball_radius * math.sqrt(3)
+
+
+
+        ball_idx = 0
+        for row in range(5): #lekol row
+            for col in range(row + 1): #lekol column
+                x = triangle_start_x + row * (2 * ball_radius) * 0.5
+                y = triangle_start_y - row_spacing * (row / 2) + col * row_spacing
+                colour = COLOURS[ball_idx % len(COLOURS)] #ne5tar colour for ball
+                ball = RigidBody(position=[x, y], velocity=[0, 0], mass=1.0, radius=ball_radius, colour=colour, elasticity=0.95)
+                engine.add_body(ball) #nezawed ball fel engine
+                ball_idx += 1
+        return engine, cue_ball #return el engine w el cue ball
+
+    engine, cue_ball = setup_game()  #set up el game
+    score = 0  #initial score
+
+
+    clock = pygame.time.Clock()  #set el clock 34an n-control el frame rate
+    running = True  #set el game loop
+    aiming = False  #3shan n3rf law el user 3amely aiming
+    mouse_down_pos = None  #3shan ne7awel el position beta3 el mouse
+    current_mouse_pos = None #3shan n3rf makan el mouse
+
+    while running:
+        dt = clock.tick(60) / 1000.0  #frame rate
+
+        for event in pygame.event.get():  #for each event
+            if event.type == pygame.QUIT:  #lama el user y3ml close el window
+                running = False
+
+
+            elif event.type == pygame.MOUSEBUTTONDOWN:  #lama el user yedos 3ala el mouse
+                aiming = True
+                mouse_down_pos = np.array(pygame.mouse.get_pos(), dtype=float)
+
+            elif event.type == pygame.MOUSEBUTTONUP and aiming: #lama el user y-aim bl mouse
+                mouse_up_pos = np.array(pygame.mouse.get_pos(), dtype=float)
+                shot_vector = mouse_down_pos - mouse_up_pos  #el vector beta3 el shot
+                power = np.linalg.norm(shot_vector) * 3  #calculate el power
+                if power > 0:  #lw el power kbeer
+                    direction = shot_vector / np.linalg.norm(shot_vector)  #direction beta3 el shot
+                    cue_ball.velocity += direction * min(power, 800) / cue_ball.mass  #apply el shot lel cue ball
+                aiming = False
+                mouse_down_pos = None
+                current_mouse_pos = None
+
+            elif event.type == pygame.MOUSEMOTION and aiming:
+                current_mouse_pos = np.array(pygame.mouse.get_pos(), dtype=float)
+
+            elif event.type == pygame.KEYDOWN:  #lw el user da5al key
+                if event.key == pygame.K_r:  #lw da5al key "R"
+                    engine, cue_ball = setup_game()  #y-reset el game
+                    score = 0  #y-reset el score
+
+        engine.step(dt, WIDTH, HEIGHT)  #ye7aseb el physics bta3 el game
+
+        balls_to_remove = []  #list lel balls ely hatetshal
+        cue_ball_pocketed = False  #flag 3shan n3rf lw el cue ball is pocketed
+
+        for ball in engine.bodies:  #loop fe el balls
+            for px, py in pockets:  #loop fe el pockets
+                dist = np.linalg.norm(ball.position - np.array([px, py]))  #el masafa ben el ball w el pocket
+                if dist < pocket_radius:  #law el ball pocketed
+                    if ball == cue_ball:  #law el cue ball pocketed
+                        cue_ball_pocketed = True
+                    else:
+                        balls_to_remove.append(ball)  # nsheel el balls ely et7atet fi el list (da5alet el pocket)
+
+
+        #remove el balls ely da5alet fel pockets
+        for ball in balls_to_remove:  
+            engine.bodies.remove(ball)
+            score += 1  #yezawed el score
+
+        #law el cue ball da5alet el pocket, y3ml reset lel game
+        if cue_ball_pocketed:  
+            time.sleep(0.5)  #nestana showaya 3ashan el player yshouf el result
+            cue_ball.position = np.array([150, HEIGHT / 2], dtype=float)  #return el cue ball le makanoh el awal
+            cue_ball.velocity = np.zeros(2, dtype=float)  #el velocity bta3 el cue ball yeb2a 0
+
+        screen.fill(BROWN)  #ye7ot el boarders brown
+        pygame.draw.rect(screen, GREEN, (20, 20, WIDTH - 40, HEIGHT - 40))  #draw el table
+
+        #draw el pockets
+        for px, py in pockets:
+            pygame.draw.circle(screen, (50, 50, 50), (int(px), int(py)), pocket_radius)
+
+        #draw el balls
+        for ball in engine.bodies:
+            pos = (int(ball.position[0]), int(ball.position[1]))
+            pygame.draw.circle(screen, ball.colour, pos, int(ball.radius))
+
+        #draw el aiming line lama el user y-aim 
+        if aiming and current_mouse_pos is not None:
+            pygame.draw.line(screen, (255, 255, 255), cue_ball.position, current_mouse_pos, 3)
+
+        #render el score
+        score_text = font.render(f"Score: {score}", True, (255, 255, 255))
+        screen.blit(score_text, (WIDTH - 150, 20)) #display el score 3l screen
+
+        #law kol el balls da5alet el pockets ma3ada el cue ball, el player keda kasab
+        if len(engine.bodies) == 1: #34an nshow 2n el player kasab
+            win_text = font.render("YOU WIN!", True, (255, 215, 0))
+            screen.blit(win_text, (WIDTH // 2 - 70, HEIGHT // 2 - 20))
+
+        pygame.display.flip() #update el screen
+
+    pygame.quit() #close pygame
+
+if __name__ == "__main__": #start el game
+    main()
