@@ -19,7 +19,7 @@ Handles friction, momentum transfer, and angle-based reflection without external
 Smooth Animation
 Optimised frame updates for fluid gameplay at high FPS.
 
-##Gameplay Overview
+## Gameplay Overview
 
 The player controls the cue ball.
 Click and drag to set shot direction and power.
@@ -27,7 +27,7 @@ Release to strike and watch the physics simulation in action.
 Balls collide, bounce, and pocket dynamically.
 
 
-##Controls
+## Controls
 Action                       Control
 Aim / Set Direction	         Move the mouse
 Charge Shot Power	           Click and drag backward
@@ -35,7 +35,7 @@ Shoot	                       Release left mouse button
 Reset Game	                 Press R
 
 
-##Technical Highlights
+## Technical Highlights
 
 Language: Python
 Library: Pygame
@@ -45,7 +45,7 @@ Particle system (collision sparks, pocket dust, cue impact)
 Friction & velocity decay simulation
 Object-oriented design (Ball, Cue, Table, Particle, GameManager)
 
-##Project Structure
+## Project Structure
 
 ```
 pool_game/
@@ -61,7 +61,7 @@ pool_game/
 └── README.md               # Project documentation
 ```
 
-##Installation & Running
+## Installation & Running
 
 1. Clone the repository:
 git clone https://github.com/donia-essam/Pool-Game.git
