@@ -28,11 +28,11 @@ Optimised frame updates for fluid gameplay at high FPS.
 
 
 ## Controls
-Action                       Control
-- Aim / Set Direction	         Move the mouse
-- Charge Shot Power	           Click and drag backward
-- Shoot	                       Release left mouse button
-- Reset Game	                 Press R
+Action                 ->        Control
+- Aim / Set Direction	   ->      Move the mouse
+- Charge Shot Power	       ->    Click and drag backward
+- Shoot	                   ->    Release left mouse button
+- Reset Game	            ->     Press R
 
 
 ## Technical Highlights
