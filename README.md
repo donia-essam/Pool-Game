@@ -4,27 +4,27 @@ A 2D pool (billiards) game built using Python and Pygame, featuring realistic ph
 
 ## Features
 
-Physics-Based Simulation
+- Physics-Based Simulation
 Realistic motion and collisions between balls and table boundaries.
 
-Particle System
+- Particle System
 Subtle particle effects for collisions, pocketing, and cue strikes.
 
-Interactive Gameplay
+- Interactive Gameplay
 Aim, shoot, and control the cue ball using the mouse.
 
-Custom Physics Engine
+- Custom Physics Engine
 Handles friction, momentum transfer, and angle-based reflection without external physics libraries.
 
-Smooth Animation
+- Smooth Animation
 Optimised frame updates for fluid gameplay at high FPS.
 
 ## Gameplay Overview
 
-The player controls the cue ball.
-Click and drag to set shot direction and power.
-Release to strike and watch the physics simulation in action.
-Balls collide, bounce, and pocket dynamically.
+- The player controls the cue ball.
+- Click and drag to set shot direction and power.
+- Release to strike and watch the physics simulation in action.
+- Balls collide, bounce, and pocket dynamically.
 
 
 ## Controls
