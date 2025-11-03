@@ -29,21 +29,21 @@ Optimised frame updates for fluid gameplay at high FPS.
 
 ## Controls
 Action                       Control
-Aim / Set Direction	         Move the mouse
-Charge Shot Power	           Click and drag backward
-Shoot	                       Release left mouse button
-Reset Game	                 Press R
+- Aim / Set Direction	         Move the mouse
+- Charge Shot Power	           Click and drag backward
+- Shoot	                       Release left mouse button
+- Reset Game	                 Press R
 
 
 ## Technical Highlights
 
-Language: Python
-Library: Pygame
-Core Systems:
-Vector-based motion & collision resolution
-Particle system (collision sparks, pocket dust, cue impact)
-Friction & velocity decay simulation
-Object-oriented design (Ball, Cue, Table, Particle, GameManager)
+- Language: Python
+- Library: Pygame
+- Core Systems:
+- Vector-based motion & collision resolution
+- Particle system (collision sparks, pocket dust, cue impact)
+- Friction & velocity decay simulation
+- Object-oriented design (Ball, Cue, Table, Particle, GameManager)
 
 ## Project Structure
 
