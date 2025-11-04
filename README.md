@@ -2,7 +2,6 @@
 
 A 2D pool (billiards) game built using Python and Pygame, featuring realistic physics-based ball movement, collision handling, and particle effects for immersive visuals.
 
----
 
 ## Features
 
@@ -21,7 +20,6 @@ Handles friction, momentum transfer, and angle-based reflection without external
 - **Smooth Animation:**
 Optimised frame updates for fluid gameplay at high FPS.
 
----
 
 ## Gameplay Overview
 
@@ -31,7 +29,6 @@ Optimised frame updates for fluid gameplay at high FPS.
 - Balls collide, bounce, and pocket dynamically.
 
 
----
 
 ## Controls
 Action                 ->        Control
@@ -40,10 +37,7 @@ Action                 ->        Control
 - Shoot	                   ->    Release left mouse button
 - Reset Game	            ->     Press R
 
----
 
-
----
 
 ## Technical Highlights
 
@@ -55,9 +49,7 @@ Action                 ->        Control
 - *Friction & velocity decay simulation*
 - *Object-oriented design (Ball, Cue, Table, Particle, GameManager)*
 
----
 
----
 
 ## Project Structure
 
@@ -75,9 +67,8 @@ pool_game/
 └── README.md               # Project documentation
 ```
 
----
 
----
+
 ## Requirements
 
 ### Hardware
@@ -87,9 +78,7 @@ pool_game/
 - **Python 3.7+**
 - **Pygame library**
 
----
 
----
 
 ## Installation & Running
 
